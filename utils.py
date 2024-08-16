@@ -7,6 +7,14 @@ mp_pose = mp.solutions.pose
 
 # Function to calculate the angle between three joints
 class Utils:
+    width = 1280
+    height = 720
+    fps = 30
+
+    ORANGE_SHADE = (235, 94, 40)
+    GRAY_SHADE = (64, 61, 57)
+    WHITE_SHADE = (255, 252, 242)
+
     landmark_dict = {
         'nose': mp_pose.PoseLandmark.NOSE,
         'left_eye_inner': mp_pose.PoseLandmark.LEFT_EYE_INNER,
@@ -59,17 +67,20 @@ class Utils:
 
     @staticmethod
     def display_angles(frame, body):
+        if body is None:
+            print("No body detected")
+            return
         angles = [
-            (body.left_elbow_angle, body.left_elbow),
+            # (body.left_elbow_angle, body.left_elbow),
             (body.right_elbow_angle, body.right_elbow),
-            (body.left_shoulder_angle, body.left_shoulder),
-            (body.right_shoulder_angle, body.right_shoulder),
-            (body.left_knee_angle, body.left_knee),
-            (body.right_knee_angle, body.right_knee),
+            # (body.left_shoulder_angle, body.left_shoulder),
+            # (body.right_shoulder_angle, body.right_shoulder),
+            # (body.left_knee_angle, body.left_knee),
+            # (body.right_knee_angle, body.right_knee),
             # (body.left_outer_hip_angle, body.left_hip),
-            (body.left_inner_hip_angle, body.left_hip),
+            # (body.left_inner_hip_angle, body.left_hip),
             # (body.right_outer_hip_angle, body.right_hip),
-            (body.right_inner_hip_angle, body.right_hip)
+            # (body.right_inner_hip_angle, body.right_hip)
         ]
 
         for angle, part in angles:
