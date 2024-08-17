@@ -212,13 +212,9 @@ def main():
                                             False, True, False,
                                             5, 60.0,
                                             body,
-                                            conditions.crunches_condition)
+                                            conditions.pile_squats)
                         if not wait_for_body_in_frame(cap, pose, window, exercise.is_standing):
                             continue
-                        # exercise = Exercise("Elbow bends", "./Resources/Woman doing Side Lunges.gif",
-                        #                     False, True, 5, 30.0,
-                        #                     body,
-                        #                     conditions.left_elbow_bend_condition)
                         print(f'Starting exercise: {exercise.name}')
                         print(f'You have {exercise.elapsed_time} seconds to complete {exercise.reps} reps')
                         start_exercise(exercise, cap, pose, window)
