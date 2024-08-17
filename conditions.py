@@ -14,6 +14,24 @@ def verify_rep(percentage, direction):
     return False, direction
 
 
+def verify_rep_double_sided_exercises(percentage, direction):
+    if percentage == 100:
+        if direction == 0:
+            print("1/4 there")
+            return False, 1
+        if direction == 2:
+            print("3/4 there")
+            return False, 3
+    if percentage == 0:
+        if direction == 1:
+            print("half there")
+            return False, 2
+        if direction == 3:
+            print("Rep completed")
+            return True, 0
+    return False, direction
+
+
 def left_elbow_bend(body, direction):
     percentage = np.interp(body.right_elbow_angle, (90, 175), (0, 100))
     return verify_rep(percentage, direction)
@@ -102,3 +120,15 @@ def right_leg_elevation(body, direction):
     left_outer_hip_percentage = np.interp(body.left_outer_hip_angle, (160, 175), (100, 0))
     return verify_rep(int(left_outer_hip_percentage), direction)
 
+
+#double sided exercises
+
+def side_bends(body, direction):
+    #user should always start with left side
+    right_shoulder_percentage = np.interp(body.right_shoulder_angle, (100, 145), (100, 0))
+    left_shoulder_percentage = np.interp(body.left_shoulder_angle, (100, 145), (100, 0))
+    if direction < 2:
+        percentage = right_shoulder_percentage
+    else:
+        percentage = left_shoulder_percentage
+    return verify_rep_double_sided_exercises(percentage, direction)
