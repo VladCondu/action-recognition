@@ -8,7 +8,7 @@ mp_pose = mp.solutions.pose
 # Function to calculate the angle between three joints
 class Utils:
     width = 1280
-    height = 720
+    height = 1024
     fps = 30
 
     ORANGE_SHADE = (235, 94, 40)
@@ -77,7 +77,7 @@ class Utils:
             # (body.right_shoulder_angle, body.right_shoulder),
             # (body.left_knee_angle, body.left_knee),
             # (body.right_knee_angle, body.right_knee),
-            # (body.left_outer_hip_angle, body.left_hip),
+            # (body.left_outer_hip_angle, body.lesft_hip),
             # (body.left_inner_hip_angle, body.left_hip),
             # (body.right_outer_hip_angle, body.right_hip),
             # (body.right_inner_hip_angle, body.right_hip)
@@ -88,7 +88,8 @@ class Utils:
 
     @staticmethod
     def put_text_on_frame(frame, body_angle, body_part):
+        w, h, _ = frame.shape
         cv.putText(frame, str(body_angle),
-                   tuple(np.multiply(body_part, [1280, 720]).astype(int)),
+                   tuple(np.multiply(body_part, [w, h]).astype(int)),
                    cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv.LINE_AA
                    )

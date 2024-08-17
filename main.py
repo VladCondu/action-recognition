@@ -1,3 +1,4 @@
+import math
 import time
 
 import cv2
@@ -14,13 +15,18 @@ from exercise import Exercise
 
 def start_webcam_capture():
     capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
-    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 540)
     capture.set(cv2.CAP_PROP_FPS, 30)
     return capture
 
 
-def build_frame_and_body(frame, pose):
+def build_frame_and_body(cap, pose):
+    success, frame = cap.read()
+    if not success:
+        print("Ignoring empty camera frame.")
+        return None, None
+
     frame = cv2.flip(frame, 1)
     results = Utils.process_image(frame, pose)
 
@@ -39,6 +45,80 @@ def build_frame_and_body(frame, pose):
     return frame, body
 
 
+def draw_get_in_frame_border(window, is_standing):
+    if window is None:
+        raise ValueError("Window is None")
+
+    # Standing position frame
+    standing_rect_origin_x, standing_rect_origin_y = 240, 50
+    standing_rect_width, standing_rect_height = 800, 924
+
+    # Laying position frame
+    laying_rect_origin_x, laying_rect_origin_y = 50, 150
+    laying_rect_width, laying_rect_height = 1180, 724
+
+    if is_standing:
+        standing_rect_sizes = (standing_rect_origin_x, standing_rect_origin_y,
+                               standing_rect_width, standing_rect_height)
+        pygame.draw.rect(window, (221, 221, 221, 70), standing_rect_sizes, 4,
+                         border_radius=20)
+    else:
+        laying_rect_sizes = (laying_rect_origin_x, laying_rect_origin_y,
+                             laying_rect_width, laying_rect_height)
+        pygame.draw.rect(window, (221, 221, 221, 70), laying_rect_sizes, 4,
+                         border_radius=20)
+
+    return window
+
+
+def check_if_body_in_frame(body, is_standing):
+    if body is None:
+        return False
+    # print(f' Nose: {body.nose}')
+    # print(f' Right heel: {body.right_heel}')
+    # print(f' Left heel: {body.left_heel}')
+    if is_standing:
+        if (0.4 < body.nose[0] < 0.6 and 0.05 < body.nose[1] < 0.2
+                and 0.4 < body.right_heel[0] < 0.6 and 0.8 < body.right_heel[1] < 0.9
+                and 0.4 < body.left_heel[0] < 0.7 and 0.8 < body.left_heel[1] < 0.9):
+            return True
+    else:
+        if (0.1 < body.nose[0] < 0.3 and 0.2 < body.nose[1] < 0.5
+                and 0.6 < body.right_heel[0] < 0.75
+                and 0.6 < body.right_heel[1] < 0.8):
+            return True
+
+    return False
+
+
+def wait_for_body_in_frame(cap, pose, window, is_standing):
+    countdown = 3
+    last_decrement_time = time.time()
+
+    while countdown > -1:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                return False
+
+        body = get_body_and_display_frame(cap, pose, window)
+        draw_get_in_frame_border(window, is_standing)
+
+        # Update the display
+        pygame.display.flip()
+
+        # Start countdown if body is in frame
+        current_time = time.time()
+        is_body_in_frame = check_if_body_in_frame(body, is_standing)
+        if is_body_in_frame and current_time - last_decrement_time >= 1:
+            countdown -= 1
+            last_decrement_time = current_time
+            print(f'Countdown: {countdown}')
+        elif not is_body_in_frame:
+            countdown = 3
+
+    return True
+
+
 def start_exercise(exercise, cap, pose, window):
     timer = time.time()
     remaining_reps = exercise.reps
@@ -51,15 +131,13 @@ def start_exercise(exercise, cap, pose, window):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                 pygame.quit()
-        success, frame = cap.read()
-        if not success:
-            print("Ignoring empty camera frame.")
-            continue
+
+        exercise.body = get_body_and_display_frame(cap, pose, window)
 
         current_time = time.time()
 
         if current_time - last_print_time >= 1:
-            print(f'Time remaining: {int(exercise.elapsed_time - (current_time - timer))}')
+            print(f'Time remaining: {math.ceil(exercise.elapsed_time - (current_time - timer))}')
             last_print_time = current_time
 
         completed, direction = exercise.check_conditions()
@@ -71,23 +149,25 @@ def start_exercise(exercise, cap, pose, window):
                 return
 
         exercise.direction = direction
-        exercise.body = get_body_and_display_frame(frame, pose, window)
         all_sprites.update()
         all_sprites.draw(window)
         pygame.display.flip()
+    print('Time up!')
+    return
 
 
-def get_body_and_display_frame(frame, pose, window):
-    frame, body = build_frame_and_body(frame, pose)
+def get_body_and_display_frame(cap, pose, window):
+    frame, body = build_frame_and_body(cap, pose)
 
     # Uncomment to display angles
-    Utils.display_angles(frame, body)
+    # Utils.display_angles(frame, body)
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frame_rgb = np.rot90(frame_rgb)
     # frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
 
     img = pygame.surfarray.make_surface(frame_rgb).convert()
     img = pygame.transform.flip(img, True, False)
+    img = pygame.transform.scale(img, (1280, 1024))
     window.blit(img, (0, 0))
 
     # Update the display
@@ -112,6 +192,7 @@ def main():
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         try:
             while cap.isOpened() and running:
+                body = get_body_and_display_frame(cap, pose, window)
                 # Handle events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -123,24 +204,25 @@ def main():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                         print('Loading exercise...')
                         # exercise = Exercise("Side Lunges", "Resources/Woman doing Side Lunges.gif",
-                        #                     False, True, 5, 30.0,
+                        #                     False, True, False,
+                        #                     5, 45.0,
                         #                     body,
                         #                     conditions.left_side_lunge_condition)
-                        exercise = Exercise("Elbow bends", "./Resources/Woman doing Side Lunges.gif",
-                                            False, True, 5, 30.0,
+                        exercise = Exercise("Pile squats", "Resources/Woman doing Side Lunges.gif",
+                                            False, True, False,
+                                            5, 60.0,
                                             body,
-                                            conditions.left_elbow_bend_condition)
+                                            conditions.crunches_condition)
+                        if not wait_for_body_in_frame(cap, pose, window, exercise.is_standing):
+                            continue
+                        # exercise = Exercise("Elbow bends", "./Resources/Woman doing Side Lunges.gif",
+                        #                     False, True, 5, 30.0,
+                        #                     body,
+                        #                     conditions.left_elbow_bend_condition)
                         print(f'Starting exercise: {exercise.name}')
-                        print(
-                            f'You have {exercise.elapsed_time} seconds to complete {exercise.reps} reps')
+                        print(f'You have {exercise.elapsed_time} seconds to complete {exercise.reps} reps')
                         start_exercise(exercise, cap, pose, window)
 
-                success, frame = cap.read()
-                if not success:
-                    print("Ignoring empty camera frame.")
-                    continue
-
-                body = get_body_and_display_frame(frame, pose, window)
                 pygame.display.flip()
         finally:
             cap.release()

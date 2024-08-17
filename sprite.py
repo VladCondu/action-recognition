@@ -11,18 +11,18 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.image_index = 0
 
     def update(self):
-        self.image_index += 2
+        self.image_index += 1
         if self.image_index >= len(self.images):
             self.image_index = 0
         self.image = self.images[self.image_index]
 
     @staticmethod
     def loadGIF(filename):
-        pilImage = Image.open(filename)
+        pil_image = Image.open(filename)
         frames = []
-        for frame in ImageSequence.Iterator(pilImage):
+        for frame in ImageSequence.Iterator(pil_image):
             frame = frame.convert('RGBA')
-            pygameImage = pygame.image.fromstring(
+            pygame_image = pygame.image.fromstring(
                 frame.tobytes(), frame.size, frame.mode).convert()
-            frames.append(pygameImage)
+            frames.append(pygame_image)
         return frames

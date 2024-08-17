@@ -11,6 +11,7 @@ class Exercise:
     image_url: str
     is_side_position: bool
     is_front_position: bool
+    is_standing: bool
     reps: int
     elapsed_time: float
     body: Body
