@@ -208,11 +208,11 @@ def main():
                         #                     5, 45.0,
                         #                     body,
                         #                     conditions.left_side_lunge_condition)
-                        exercise = Exercise("Pile squats", "Resources/Woman doing Side Lunges.gif",
-                                            False, True, False,
-                                            5, 60.0,
+                        exercise = Exercise("Lunges right leg", "Resources/Woman doing Side Lunges.gif",
+                                            False, True, True,
+                                            2, 60.0,
                                             body,
-                                            conditions.pile_squats)
+                                            conditions.left_leg_elevation)
                         if not wait_for_body_in_frame(cap, pose, window, exercise.is_standing):
                             continue
                         print(f'Starting exercise: {exercise.name}')

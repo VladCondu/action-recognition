@@ -72,11 +72,11 @@ class Utils:
             return
         angles = [
             # (body.left_elbow_angle, body.left_elbow),
-            (body.right_elbow_angle, body.right_elbow),
+            # (body.right_elbow_angle, body.right_elbow),
             # (body.left_shoulder_angle, body.left_shoulder),
             # (body.right_shoulder_angle, body.right_shoulder),
             # (body.left_knee_angle, body.left_knee),
-            # (body.right_knee_angle, body.right_knee),
+            (body.right_knee_angle, body.right_knee),
             # (body.left_outer_hip_angle, body.lesft_hip),
             # (body.left_inner_hip_angle, body.left_hip),
             # (body.right_outer_hip_angle, body.right_hip),
