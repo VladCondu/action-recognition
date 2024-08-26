@@ -8,9 +8,9 @@ from body import Body
 @dataclass
 class Exercise:
     name: str
-    image_url: str
+    gif_path: str
+    starting_posture_path: str
     is_side_position: bool
-    is_front_position: bool
     is_standing: bool
     reps: int
     elapsed_time: float
@@ -19,10 +19,12 @@ class Exercise:
     direction: int = 0
 
     def __post_init__(self):
-        if self.is_side_position and self.is_front_position:
-            raise ValueError("Exercise cannot be both side and front position")
+        if not self.is_side_position and not self.is_standing:
+            raise ValueError("Front position exercises must be standing")
 
     def check_conditions(self):
+        if self.body is None:
+            return False, self.direction, 0
         return self.condition(self.body, self.direction)
 
     def give_hints(self):

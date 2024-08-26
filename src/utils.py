@@ -1,6 +1,9 @@
 import numpy as np
 import cv2 as cv
 import mediapipe as mp
+import pygame
+
+from sprite import AnimatedSprite
 
 mp_pose = mp.solutions.pose
 
@@ -10,10 +13,12 @@ class Utils:
     width = 1280
     height = 1024
     fps = 30
-
-    ORANGE_SHADE = (235, 94, 40)
+    font = '../resources/fonts/Laro Soft Medium.ttf'
+    ORANGE_SHADE_DARK = (215, 74, 20)
+    ORANGE_SHADE_BRIGHT = (255, 134, 80)
     GRAY_SHADE = (64, 61, 57)
     WHITE_SHADE = (255, 252, 242)
+    BLACK = (0, 0, 0)
 
     landmark_dict = {
         'nose': mp_pose.PoseLandmark.NOSE,
@@ -76,7 +81,7 @@ class Utils:
             # (body.left_shoulder_angle, body.left_shoulder),
             # (body.right_shoulder_angle, body.right_shoulder),
             # (body.left_knee_angle, body.left_knee),
-            (body.right_knee_angle, body.right_knee),
+            # (body.right_knee_angle, body.right_knee),
             # (body.left_outer_hip_angle, body.lesft_hip),
             # (body.left_inner_hip_angle, body.left_hip),
             # (body.right_outer_hip_angle, body.right_hip),
@@ -93,3 +98,10 @@ class Utils:
                    tuple(np.multiply(body_part, [w, h]).astype(int)),
                    cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv.LINE_AA
                    )
+
+    @staticmethod
+    def get_gif_from_url(image_url, scale):
+        animation_frame_list = AnimatedSprite.loadGIF(image_url, scale)
+        animated_sprite = AnimatedSprite(150, Utils.height - 50, animation_frame_list)
+        gif = pygame.sprite.Group(animated_sprite)
+        return gif
