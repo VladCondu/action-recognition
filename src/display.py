@@ -9,8 +9,6 @@ from pygame import gfxdraw
 from body import Body
 from utils import Utils
 
-click = False
-
 
 class Display:
     def __init__(self):
@@ -99,7 +97,6 @@ class Display:
         img = pygame.transform.scale(img, (1280, 1024))
         self.window.blit(img, (0, 0))
         if body is None and draw_landmarks is True:
-            print(draw_landmarks)
             rect = pygame.rect.Rect(0, 0, 900, 100)
             rect.center = (640, 512)
             pygame.draw.rect(self.window, Utils.GRAY_SHADE, rect, border_radius=10)
@@ -141,9 +138,6 @@ class Display:
                     pygame.quit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     return False
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        click = True
 
             body = self.get_body_and_display_frame(True)
             self.draw_get_in_frame_border(is_standing)
@@ -167,7 +161,6 @@ class Display:
             elif not is_body_in_frame:
                 countdown = 3
 
-            # self.draw_text(f'{countdown}', 640, 512, 100)
             pygame.display.flip()
 
         return True
