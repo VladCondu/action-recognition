@@ -31,23 +31,25 @@ class Display:
         if body is None:
             return False
         if is_standing:
-            if (0.4 < body.nose[0] < 0.6 and 0.05 < body.nose[1] < 0.2
-                    and 0.4 < body.right_heel[0] < 0.6 and 0.8 < body.right_heel[1] < 0.9
-                    and 0.4 < body.left_heel[0] < 0.7 and 0.8 < body.left_heel[1] < 0.9):
+            if (0.2 < body.nose[0] < 0.8 and 0.1 < body.nose[1] < 0.5
+                    and 0.2 < body.right_heel[0] < 0.8 and 0.5 < body.right_heel[1] < 1
+                    and 0.2 < body.left_heel[0] < 0.8 and 0.5 < body.left_heel[1] < 1):
                 self.draw_text(f'{countdown}', 640, 512, 100)
                 return True
         else:
-            if (0.1 < body.nose[0] < 0.3 and 0.2 < body.nose[1] < 0.5
-                    and 0.6 < body.right_heel[0] < 0.75
-                    and 0.6 < body.right_heel[1] < 0.8):
+            if (0.1 < body.nose[0] < 0.9 and 0.2 < body.nose[1] < 0.8
+                    and 0.1 < body.right_heel[0] < 0.9
+                    and 0.2 < body.right_heel[1] < 0.8
+                    and 0.1 < body.left_heel[0] < 0.9
+                    and 0.2 < body.left_heel[1] < 0.8):
                 self.draw_text(f'{countdown}', 640, 512, 100)
                 return True
         return False
 
-    def draw_text(self, text, x, y, font_size=50, color=Utils.WHITE_SHADE):
+    def draw_text(self, text, centerx, centery, font_size=50, color=Utils.WHITE_SHADE):
         font = pygame.font.Font(Utils.font, font_size)
         text = font.render(text, True, color)
-        text_rect = text.get_rect(center=(x, y))
+        text_rect = text.get_rect(center=(centerx, centery))
         self.window.blit(text, text_rect)
 
     def draw_text_for_duration(self, text, x, y, size, duration, include_time=False):
@@ -128,11 +130,11 @@ class Display:
             pygame.draw.rect(self.window, (221, 221, 221, 70), laying_rect_sizes, 4,
                              border_radius=20)
 
-    def wait_for_body_in_frame(self, is_standing, is_side_position, starting_posture_path):
-        countdown = 3
+    def wait_for_body_in_frame(self, exercise):
+        countdown = 5
         last_decrement_time = time.time()
 
-        while countdown > -1:
+        while countdown > 0:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                     pygame.quit()
@@ -140,27 +142,33 @@ class Display:
                     return False
 
             body = self.get_body_and_display_frame(True)
-            self.draw_get_in_frame_border(is_standing)
+            self.draw_get_in_frame_border(exercise.is_standing)
 
-            image = pygame.image.load(starting_posture_path).convert_alpha()
-            image.set_alpha(100)
+            image = pygame.image.load(exercise.starting_posture_path).convert_alpha()
+            image.set_alpha(180)
             self.window.blit(image, (0, 0))
 
-            if is_side_position and is_standing:
-                self.draw_text("Stand in the box", 640, 100, 30)
-                self.draw_text("Turn towards right", 640, 130, 30)
-            elif is_side_position:
-                self.draw_text("Lay down, feet towards right", 640, 512, 50)
+            if exercise.is_side_position and exercise.is_standing:
+                self.draw_text("Stand in the box", 640, 80, 30)
+                self.draw_text("Take your starting position", 640, 110, 30)
+            elif exercise.is_side_position:
+                self.draw_text("Lay down, feet towards right", 640, 100, 30)
+                self.draw_text("Take your starting position", 640, 150, 30)
+                self.draw_text("Feel free to adjust the camera", 640, 220, 15)
 
             current_time = time.time()
-            is_body_in_frame = self.check_if_body_in_frame(body, is_standing, countdown)
+            is_body_in_frame = self.check_if_body_in_frame(body, exercise.is_standing, countdown)
             if is_body_in_frame and current_time - last_decrement_time >= 1:
                 countdown -= 1
                 last_decrement_time = current_time
                 print(f'Countdown: {countdown}')
             elif not is_body_in_frame:
-                countdown = 3
+                countdown = 5
 
+            rect = pygame.Rect(0, 0, 750, 70)
+            rect.center = (640, 970)
+            pygame.draw.rect(self.window, Utils.ORANGE_SHADE_DARK, rect, border_radius=20)
+            self.draw_text(exercise.name, rect.centerx, rect.centery - 5, 50, Utils.WHITE_SHADE)
             pygame.display.flip()
 
         return True

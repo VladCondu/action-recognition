@@ -102,6 +102,6 @@ class Utils:
     @staticmethod
     def get_gif_from_url(image_url, scale):
         animation_frame_list = AnimatedSprite.loadGIF(image_url, scale)
-        animated_sprite = AnimatedSprite(150, Utils.height - 50, animation_frame_list)
+        animated_sprite = AnimatedSprite(200, Utils.height - 50, animation_frame_list)
         gif = pygame.sprite.Group(animated_sprite)
         return gif
