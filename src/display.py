@@ -130,16 +130,20 @@ class Display:
             pygame.draw.rect(self.window, (221, 221, 221, 70), laying_rect_sizes, 4,
                              border_radius=20)
 
-    def wait_for_body_in_frame(self, exercise):
+    def wait_for_body_in_frame(self, exercise, back_button):
+        click = False
         countdown = 5
         last_decrement_time = time.time()
 
         while countdown > 0:
+            mx, my = pygame.mouse.get_pos()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                     pygame.quit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                    return False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
 
             body = self.get_body_and_display_frame(True)
             self.draw_get_in_frame_border(exercise.is_standing)
@@ -148,13 +152,20 @@ class Display:
             image.set_alpha(180)
             self.window.blit(image, (0, 0))
 
-            if exercise.is_side_position and exercise.is_standing:
+            rect = pygame.Rect(0, 0, 750, 70)
+            if exercise.is_standing:
                 self.draw_text("Stand in the box", 640, 80, 30)
                 self.draw_text("Take your starting position", 640, 110, 30)
-            elif exercise.is_side_position:
-                self.draw_text("Lay down, feet towards right", 640, 100, 30)
-                self.draw_text("Take your starting position", 640, 150, 30)
-                self.draw_text("Feel free to adjust the camera", 640, 220, 15)
+                rect.center = (640, 970)
+                pygame.draw.rect(self.window, Utils.ORANGE_SHADE_DARK, rect, border_radius=20)
+                self.draw_text(exercise.name, rect.centerx, rect.centery - 5, 50, Utils.WHITE_SHADE)
+            else:
+                self.draw_text("Lay down in the box", 640, 80, 30)
+                self.draw_text("Take your starting position", 640, 120, 30)
+                self.draw_text("Feel free to adjust the camera", 640, 170, 15)
+                rect.center = (640, 870)
+                pygame.draw.rect(self.window, Utils.ORANGE_SHADE_DARK, rect, border_radius=20)
+                self.draw_text(exercise.name, rect.centerx, rect.centery - 5, 50, Utils.WHITE_SHADE)
 
             current_time = time.time()
             is_body_in_frame = self.check_if_body_in_frame(body, exercise.is_standing, countdown)
@@ -165,10 +176,9 @@ class Display:
             elif not is_body_in_frame:
                 countdown = 5
 
-            rect = pygame.Rect(0, 0, 750, 70)
-            rect.center = (640, 970)
-            pygame.draw.rect(self.window, Utils.ORANGE_SHADE_DARK, rect, border_radius=20)
-            self.draw_text(exercise.name, rect.centerx, rect.centery - 5, 50, Utils.WHITE_SHADE)
+            self.window.blit(back_button, (50, 50))
+            if back_button.get_rect().move(50, 50).collidepoint((mx, my)) and click:
+                return False
             pygame.display.flip()
 
         return True

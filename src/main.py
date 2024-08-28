@@ -9,8 +9,6 @@ from utils import Utils
 from exercise_rect import ExerciseRect
 from paginator import Paginator
 
-logger = logging.getLogger(__name__)
-
 
 def start_exercise(exercise, display):
     click = False
@@ -61,7 +59,7 @@ def start_exercise(exercise, display):
     return
 
 
-def begin_set(display, set_name, break_duration):
+def begin_set(display, set_name, break_duration, back_button):
     # loading set
     exercises = sets[set_name]
 
@@ -69,15 +67,13 @@ def begin_set(display, set_name, break_duration):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
                 pygame.quit()
-        if not display.wait_for_body_in_frame(exercise):
+        if not display.wait_for_body_in_frame(exercise, back_button):
             return
-        print(f'Starting exercise: {exercise.name}')
-        print(f'You have {exercise.elapsed_time} seconds to complete {exercise.reps} reps')
         start_exercise(exercise, display)
         display.draw_text_for_duration('Take a break for ', 640, 512, 100, break_duration, True)
 
 
-def build_your_own_set(display):
+def build_your_own_set(display, back_button):
     click = False
     running = True
     items_per_page = 9
@@ -186,10 +182,8 @@ def build_your_own_set(display):
                 paginator.current_page = page
                 click = False
 
-        back_button_image = pygame.image.load("../resources/previous.png").convert_alpha()
-        back_button_image = pygame.transform.scale(back_button_image, (50, 50))
-        display.window.blit(back_button_image, (50, 50))
-        if back_button_image.get_rect().move(50, 50).collidepoint((mx, my)) and click:
+        display.window.blit(back_button, (50, 50))
+        if back_button.get_rect().move(50, 50).collidepoint((mx, my)) and click:
             running = False
             click = False
 
@@ -200,7 +194,7 @@ def build_your_own_set(display):
         if begin_set_button.collidepoint((mx, my)) and click:
             if selected_exercises:
                 sets['custom_set'] = selected_exercises
-                begin_set(display, 'custom_set', break_duration)
+                begin_set(display, 'custom_set', break_duration, back_button)
                 running = False
                 click = False
 
@@ -214,7 +208,6 @@ def main_menu():
     pygame.display.set_caption("MediaPipe action recognition")
 
     if not display.cap.isOpened():
-        logger.error("Could not open webcam.")
         display.window.fill(Utils.BLACK)
         display.draw_text("Could not open the webcam!", 640, 462, 30)
         display.draw_text("Enable webcam and restart the application.", 640, 562, 30)
@@ -269,26 +262,33 @@ def main_menu():
             display.draw_text("Build your own set", build_your_own_set_button.centerx,
                               build_your_own_set_button.centery, 30)
 
+            back_button_image = pygame.image.load("../resources/previous.png").convert_alpha()
+            back_button_image = pygame.transform.scale(back_button_image, (50, 50))
+            display.window.blit(back_button_image, (50, 50))
+            if back_button_image.get_rect().move(50, 50).collidepoint((mx, my)) and click:
+                running = False
+                click = False
+
             # click handling
             if full_day_starter_set_button.collidepoint((mx, my)):
                 if click:
-                    begin_set(display, 'full_body_day_starter', 5)
+                    begin_set(display, 'full_body_day_starter', 5, back_button_image)
                     click = False
             if lower_back_work_set_button.collidepoint((mx, my)):
                 if click:
-                    begin_set(display, 'lower_back_work', 15)
+                    begin_set(display, 'lower_back_work', 15, back_button_image)
                     click = False
             if core_work_set_button.collidepoint((mx, my)):
                 if click:
-                    begin_set(display, 'core_work', 15)
+                    begin_set(display, 'core_work', 15, back_button_image)
                     click = False
             if leg_work_set_button.collidepoint((mx, my)):
                 if click:
-                    begin_set(display, 'leg_work', 15)
+                    begin_set(display, 'leg_work', 15, back_button_image)
                     click = False
             if build_your_own_set_button.collidepoint((mx, my)):
                 if click:
-                    build_your_own_set(display)
+                    build_your_own_set(display, back_button_image)
                     click = False
 
             # event handling
@@ -306,16 +306,9 @@ def main_menu():
                     running = False
                     pygame.quit()
 
-            back_button_image = pygame.image.load("../resources/previous.png").convert_alpha()
-            back_button_image = pygame.transform.scale(back_button_image, (50, 50))
-            display.window.blit(back_button_image, (50, 50))
-            if back_button_image.get_rect().move(50, 50).collidepoint((mx, my)) and click:
-                running = False
-                click = False
-
             pygame.display.flip()
     except Exception as e:
-        logger.error(e)
+        print(f'ERROR: {e}')
     finally:
         display.cap.release()
         exit()
