@@ -13,7 +13,7 @@ class Utils:
     width = 1280
     height = 1024
     fps = 30
-    font = 'resources/fonts/Laro Soft Medium.ttf'
+    font = './resources/fonts/Laro Soft Medium.ttf'
     BLUE_SHADE_HOVER = (33, 164, 176)
     BLUE_SHADE_DARK = (25, 135, 145)
     BLUE_SHADE_BRIGHT = (30, 201, 217)

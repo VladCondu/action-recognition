@@ -22,9 +22,9 @@ class Display:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-        self.back_button_image = pygame.image.load("resources/buttons/previous.png").convert_alpha()
+        self.back_button_image = pygame.image.load("./resources/buttons/previous.png").convert_alpha()
         self.back_button_image = pygame.transform.scale(self.back_button_image, (50, 50))
-        self.hovered = pygame.image.load("resources/buttons/previous_hovered.png").convert_alpha()
+        self.hovered = pygame.image.load("./resources/buttons/previous_hovered.png").convert_alpha()
         self.hovered = pygame.transform.scale(self.hovered, (50, 50))
 
     @staticmethod
@@ -75,9 +75,9 @@ class Display:
     def pause_screen(self, remaining_time):
         click = False
         running = True
-        resume_button = pygame.image.load("resources/buttons/play_button.png").convert_alpha()
+        resume_button = pygame.image.load("./resources/buttons/play_button.png").convert_alpha()
         resume_button = pygame.transform.scale(resume_button, (100, 100))
-        resume_hovered = pygame.image.load("resources/buttons/play_hovered.png").convert_alpha()
+        resume_hovered = pygame.image.load("./resources/buttons/play_hovered.png").convert_alpha()
         resume_hovered = pygame.transform.scale(resume_hovered, (100, 100))
         resume = False
 
@@ -196,7 +196,7 @@ class Display:
             rect = pygame.rect.Rect(0, 0, 900, 100)
             rect.center = (Utils.width / 2, Utils.height / 2)
             pygame.draw.rect(self.window, Utils.GRAY_SHADE, rect, border_radius=10)
-            font = pygame.font.Font('resources/fonts/Laro Soft Medium.ttf', 50)
+            font = pygame.font.Font('./resources/fonts/Laro Soft Medium.ttf', 50)
             text = font.render("Go back in frame", True, Utils.BLUE_SHADE_DARK)
             text_rect = text.get_rect(center=(Utils.width / 2, Utils.height / 2))
             self.window.blit(text, text_rect)
@@ -302,9 +302,9 @@ class Display:
         self.draw_text(f'{exercise.reps}', 1120, 150, 72, Utils.WHITE_SHADE)
         self.draw_text(f'{minutes}:{seconds}', 1120, 260, 45, Utils.WHITE_SHADE)
 
-        pause_button = pygame.image.load("resources/buttons/pause_button.png").convert_alpha()
+        pause_button = pygame.image.load("./resources/buttons/pause_button.png").convert_alpha()
         pause_button = pygame.transform.scale(pause_button, (50, 50))
-        pause_hovered = pygame.image.load("resources/buttons/pause_hovered.png").convert_alpha()
+        pause_hovered = pygame.image.load("./resources/buttons/pause_hovered.png").convert_alpha()
         pause_hovered = pygame.transform.scale(pause_hovered, (50, 50))
 
         self.window.blit(pause_button, (50, 120))
@@ -330,9 +330,9 @@ class Display:
         total_pages = paginator.total_pages()
         selected_exercises = []
         break_duration = 15
-        preview_button_image = pygame.image.load("resources/buttons/preview.png").convert_alpha()
+        preview_button_image = pygame.image.load("./resources/buttons/preview.png").convert_alpha()
         preview_button_image = pygame.transform.scale(preview_button_image, (50, 50))
-        preview_hovered = pygame.image.load("resources/buttons/preview_hovered.png").convert_alpha()
+        preview_hovered = pygame.image.load("./resources/buttons/preview_hovered.png").convert_alpha()
         preview_hovered = pygame.transform.scale(preview_hovered, (50, 50))
 
         while running:
