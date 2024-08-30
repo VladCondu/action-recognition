@@ -13,10 +13,12 @@ class Utils:
     width = 1280
     height = 1024
     fps = 30
-    font = '../resources/fonts/Laro Soft Medium.ttf'
-    ORANGE_SHADE_DARK = (215, 74, 20)
-    ORANGE_SHADE_BRIGHT = (255, 134, 80)
+    font = 'resources/fonts/Laro Soft Medium.ttf'
+    BLUE_SHADE_HOVER = (33, 164, 176)
+    BLUE_SHADE_DARK = (25, 135, 145)
+    BLUE_SHADE_BRIGHT = (30, 201, 217)
     GRAY_SHADE = (64, 61, 57)
+    GRAY_SHADE_HOVER = (109, 105, 99)
     WHITE_SHADE = (255, 252, 242)
     BLACK = (0, 0, 0)
 
@@ -100,8 +102,8 @@ class Utils:
                    )
 
     @staticmethod
-    def get_gif_from_url(image_url, scale):
+    def get_gif_from_url(image_url, x=200, y=height - 50, scale=1):
         animation_frame_list = AnimatedSprite.loadGIF(image_url, scale)
-        animated_sprite = AnimatedSprite(200, Utils.height - 50, animation_frame_list)
+        animated_sprite = AnimatedSprite(x, y, animation_frame_list)
         gif = pygame.sprite.Group(animated_sprite)
         return gif
