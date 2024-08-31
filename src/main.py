@@ -95,7 +95,7 @@ def main_menu():
                 ("Build your own set", 790, None, None)
             ]
 
-            black_overlay = pygame.Surface((1280, 1024))
+            black_overlay = pygame.Surface((Utils.width, Utils.height))
             black_overlay.set_alpha(200)
             black_overlay.fill(Utils.BLACK)
             display.window.blit(black_overlay, (0, 0))

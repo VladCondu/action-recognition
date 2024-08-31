@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 import mediapipe as mp
 import pygame
+import os
 
 from sprite import AnimatedSprite
 
@@ -10,10 +11,11 @@ mp_pose = mp.solutions.pose
 
 # Function to calculate the angle between three joints
 class Utils:
-    width = 1280
-    height = 1024
+    current_dir = os.getcwd()
+    width = 1920
+    height = 1080
     fps = 30
-    font = './resources/fonts/Laro Soft Medium.ttf'
+    font = '.\\\\resources\\fonts\\Laro Soft Medium.ttf'
     BLUE_SHADE_HOVER = (33, 164, 176)
     BLUE_SHADE_DARK = (25, 135, 145)
     BLUE_SHADE_BRIGHT = (30, 201, 217)

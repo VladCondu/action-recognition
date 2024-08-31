@@ -22,17 +22,17 @@ class Display:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-        self.back_button_image = pygame.image.load("./resources/buttons/previous.png").convert_alpha()
+        self.back_button_image = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\previous.png").convert_alpha()
         self.back_button_image = pygame.transform.scale(self.back_button_image, (50, 50))
-        self.hovered = pygame.image.load("./resources/buttons/previous_hovered.png").convert_alpha()
+        self.hovered = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\previous_hovered.png").convert_alpha()
         self.hovered = pygame.transform.scale(self.hovered, (50, 50))
 
     @staticmethod
     def start_webcam_capture():
-        capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
-        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
-        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 540)
-        capture.set(cv2.CAP_PROP_FPS, 30)
+        capture = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        capture.set(cv2.CAP_PROP_FPS, 60)
         return capture
 
     def preview_exercise(self, exercise):
@@ -75,9 +75,9 @@ class Display:
     def pause_screen(self, remaining_time):
         click = False
         running = True
-        resume_button = pygame.image.load("./resources/buttons/play_button.png").convert_alpha()
+        resume_button = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\play_button.png").convert_alpha()
         resume_button = pygame.transform.scale(resume_button, (100, 100))
-        resume_hovered = pygame.image.load("./resources/buttons/play_hovered.png").convert_alpha()
+        resume_hovered = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\play_hovered.png").convert_alpha()
         resume_hovered = pygame.transform.scale(resume_hovered, (100, 100))
         resume = False
 
@@ -190,13 +190,13 @@ class Display:
 
         img = pygame.surfarray.make_surface(frame_rgb).convert()
         img = pygame.transform.flip(img, True, False)
-        img = pygame.transform.scale(img, (1280, 1024))
+        img = pygame.transform.scale(img, (Utils.width, Utils.height))
         self.window.blit(img, (0, 0))
         if body is None and draw_landmarks is True:
             rect = pygame.rect.Rect(0, 0, 900, 100)
             rect.center = (Utils.width / 2, Utils.height / 2)
             pygame.draw.rect(self.window, Utils.GRAY_SHADE, rect, border_radius=10)
-            font = pygame.font.Font('./resources/fonts/Laro Soft Medium.ttf', 50)
+            font = pygame.font.Font('.\\\\resources\\fonts\\Laro Soft Medium.ttf', 50)
             text = font.render("Go back in frame", True, Utils.BLUE_SHADE_DARK)
             text_rect = text.get_rect(center=(Utils.width / 2, Utils.height / 2))
             self.window.blit(text, text_rect)
@@ -207,21 +207,18 @@ class Display:
         if self.window is None:
             raise ValueError("Window is None")
 
-        standing_rect_origin_x, standing_rect_origin_y = 240, 50
-        standing_rect_width, standing_rect_height = 800, 924
-
-        laying_rect_origin_x, laying_rect_origin_y = 50, 150
-        laying_rect_width, laying_rect_height = 1180, 724
+        standing_rect_width, standing_rect_height = 800, 940
+        laying_rect_width, laying_rect_height = 1180, 740
 
         if is_standing:
-            standing_rect_sizes = (standing_rect_origin_x, standing_rect_origin_y,
-                                   standing_rect_width, standing_rect_height)
-            pygame.draw.rect(self.window, (221, 221, 221, 70), standing_rect_sizes, 4,
+            standing_rect = pygame.rect.Rect(0, 0, standing_rect_width, standing_rect_height)
+            standing_rect.center = (Utils.width / 2, Utils.height / 2)
+            pygame.draw.rect(self.window, (221, 221, 221, 70), standing_rect, 4,
                              border_radius=20)
         else:
-            laying_rect_sizes = (laying_rect_origin_x, laying_rect_origin_y,
-                                 laying_rect_width, laying_rect_height)
-            pygame.draw.rect(self.window, (221, 221, 221, 70), laying_rect_sizes, 4,
+            laying_rect = pygame.rect.Rect(0, 0, laying_rect_width, laying_rect_height)
+            laying_rect.center = (Utils.width / 2, Utils.height / 2)
+            pygame.draw.rect(self.window, (221, 221, 221, 70), laying_rect, 4,
                              border_radius=20)
 
     def wait_for_body_in_frame(self, exercise):
@@ -244,20 +241,21 @@ class Display:
 
             image = pygame.image.load(exercise.starting_posture_path).convert_alpha()
             image.set_alpha(180)
-            self.window.blit(image, (0, 0))
+            self.window.blit(image, (320, 0))
 
             rect = pygame.Rect(0, 0, 750, 70)
             if exercise.is_standing:
-                self.draw_text("Stand in the box", Utils.width / 2, 80, 30)
-                self.draw_text("Take your starting position", Utils.width / 2, 110, 30)
-                rect.center = (Utils.width / 2, 970)
+                self.draw_text("Stand in the box", Utils.width / 2, 100, 30)
+                self.draw_text("Take your starting position", Utils.width / 2, 130, 30)
+                self.draw_text("Feel free to adjust the camera", Utils.width / 2, 50, 25)
+                rect.center = (Utils.width / 2, Utils.height - 70)
                 pygame.draw.rect(self.window, Utils.BLUE_SHADE_DARK, rect, border_radius=20)
                 self.draw_text(exercise.name, rect.centerx, rect.centery - 5, 50, Utils.WHITE_SHADE)
             else:
                 self.draw_text("Lay down in the box", Utils.width / 2, 80, 30)
                 self.draw_text("Take your starting position", Utils.width / 2, 120, 30)
-                self.draw_text("Feel free to adjust the camera", Utils.width / 2, 170, 15)
-                rect.center = (Utils.width / 2, 870)
+                self.draw_text("Feel free to adjust the camera", Utils.width / 2, 220, 25)
+                rect.center = (Utils.width / 2, Utils.height - 170)
                 pygame.draw.rect(self.window, Utils.BLUE_SHADE_DARK, rect, border_radius=20)
                 self.draw_text(exercise.name, rect.centerx, rect.centery - 5, 50, Utils.WHITE_SHADE)
 
@@ -302,9 +300,9 @@ class Display:
         self.draw_text(f'{exercise.reps}', 1120, 150, 72, Utils.WHITE_SHADE)
         self.draw_text(f'{minutes}:{seconds}', 1120, 260, 45, Utils.WHITE_SHADE)
 
-        pause_button = pygame.image.load("./resources/buttons/pause_button.png").convert_alpha()
+        pause_button = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\pause_button.png").convert_alpha()
         pause_button = pygame.transform.scale(pause_button, (50, 50))
-        pause_hovered = pygame.image.load("./resources/buttons/pause_hovered.png").convert_alpha()
+        pause_hovered = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\pause_hovered.png").convert_alpha()
         pause_hovered = pygame.transform.scale(pause_hovered, (50, 50))
 
         self.window.blit(pause_button, (50, 120))
@@ -330,9 +328,9 @@ class Display:
         total_pages = paginator.total_pages()
         selected_exercises = []
         break_duration = 15
-        preview_button_image = pygame.image.load("./resources/buttons/preview.png").convert_alpha()
+        preview_button_image = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\preview.png").convert_alpha()
         preview_button_image = pygame.transform.scale(preview_button_image, (50, 50))
-        preview_hovered = pygame.image.load("./resources/buttons/preview_hovered.png").convert_alpha()
+        preview_hovered = pygame.image.load(Utils.current_dir + "\\resources\\buttons\\preview_hovered.png").convert_alpha()
         preview_hovered = pygame.transform.scale(preview_hovered, (50, 50))
 
         while running:
@@ -350,7 +348,7 @@ class Display:
 
             self.get_body_and_display_frame(False)
 
-            black_overlay = pygame.Surface((1280, 1024))
+            black_overlay = pygame.Surface((Utils.width, Utils.height))
             black_overlay.set_alpha(200)
             black_overlay.fill(Utils.BLACK)
             self.window.blit(black_overlay, (0, 0))
@@ -418,8 +416,8 @@ class Display:
                             click = False
 
             # break duration
-            break_title_x, break_counter_x = 350, 350
-            break_title_y, break_counter_y = 950, 980
+            break_title_x, break_counter_x = Utils.width / 4, Utils.width / 4
+            break_title_y, break_counter_y = Utils.height - 130, Utils.height - 100
             self.draw_text("Break pause duration (s)", break_title_x, break_title_y, 20)
             self.draw_text(str(break_duration), break_counter_x, break_counter_y, 20)
 
@@ -440,7 +438,7 @@ class Display:
             # paginator
             button_width, button_height, spacing = 50, 50, 10
             total_width = total_pages * button_width + (total_pages - 1) * spacing
-            start_x = (1280 - total_width) // 2
+            start_x = (Utils.width - total_width) // 2
             for page in range(total_pages):
                 button_rect = pygame.Rect(start_x + page * (button_width + spacing), 950, button_width, button_height)
                 color = Utils.BLUE_SHADE_DARK if page == paginator.current_page else Utils.GRAY_SHADE
@@ -460,6 +458,7 @@ class Display:
 
             # begin set button
             begin_set_button = pygame.Rect(840, 950, 200, 50)
+            begin_set_button.center = (Utils.width - 480, Utils.height - 100)
             if selected_exercises:
                 pygame.draw.rect(self.window, Utils.GRAY_SHADE, begin_set_button, border_radius=10)
                 self.draw_text("Start set", begin_set_button.centerx, begin_set_button.centery, 20)
